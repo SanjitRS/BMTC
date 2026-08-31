@@ -3,7 +3,7 @@
 [build]
   base = "client"
   publish = "dist"
-  command = "npm run build"
+  command = "npm install && npm run build"
 
 # SPA routing redirect (prevents 404 on page refresh)
 [[redirects]]
