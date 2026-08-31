@@ -1,109 +1,147 @@
-# Gurugale — Dementia Care Platform (Nischal Module)
+# Gurugale Platform — Section 2: Sanjit (Geofencing, GPS & Offline Sync Queue Engine)
 
-### Admin Pipeline, Clinical Dashboard, Ingestion Seam & Security
-
-This repository contains the complete implementation for **NISCHAL's module**: the clinical administration dashboard, central ingestion REST pipeline, geofence surveillance map, versioned medical record audit logger, deduplicated alert center, org-wide analytics, multilingual UI, and HIPAA/GDPR security framework.
+A modular, resilient dementia care platform engineered strictly to the **Section 0 Shared Data Contract**.
 
 ---
 
-## 0. Shared Data Contract Conformance (Section 0)
+## 🚀 Key Modules & Architecture
 
-All payloads strictly conform to the exact Section 0 shared specification:
-- `GameSession`: `{ id, patientId, gameType: "memory"|"attention"|"routine"|"pattern", startedAt, endedAt, score, accuracy, avgResponseTimeMs, errorTypes[], difficultyLevel, moodAfter?, synced }`
-- `GeofenceEvent`: `{ id, patientId, zoneId, eventType: "enter"|"exit", lat, lng, timestamp, synced }`
-- `ReminderAck`: `{ id, patientId, reminderType: "medicine"|"hydration"|"activity"|"appointment", scheduledAt, ackedAt|null, status?, synced }`
-- `PatientRecord`: `{ patientId, name, age, diagnosisStage: "early"|"moderate"|"severe", medications[], emergencyContacts[], updatedBy, updatedAt, version, history? }`
-- `SyncQueueItem`: `{ id, entityType: "game_session"|"geofence_event"|"reminder_ack"|"patient_record", payload, createdAt, synced, retryCount }`
-
----
-
-## 1. Key Features Implemented
-
-1. **Central Ingestion Pipeline (`POST /api/sync/batch`)**:
-   - Single source of truth ingesting sync batches from Praveen's cognitive games and Sanjit's geofencing/GPS engine.
-   - Atomic validation and database persistence.
-2. **Clinical Dashboard & Therapy Scorecards (Recharts)**:
-   - Longitudinal Accuracy & Score Progression trend graphs.
-   - Average Reaction Latency curves in milliseconds (detecting cognitive slowing).
-   - Streak tracking & cognitive trajectory classification: **Improving**, **Stable**, or **Declining**.
-   - **Empty States**: Brand new patients (e.g. `pat_005`) render clean, sensible guidance states without broken charts.
-3. **Interactive Geofence Map & Live Telemetry**:
-   - Safe zone boundary radii (Home, Clinic, Park).
-   - Real-time GPS coordinates and breadcrumbs trail.
-   - Geofence event log with timestamps and enter/exit badges.
-4. **Versioned Patient Records with Immutable Audit Diff Trail**:
-   - Diagnostic stage, medication schedules (dosages/times), emergency contacts, and clinical notes editor.
-   - Version incrementing on every modification ($v1 \rightarrow v2 \rightarrow v3$).
-   - Interactive **Audit Diff Modal** displaying previous snapshots, who made the edit, timestamp, and reasons without silent overwrites.
-5. **Deduplicated Alert Center**:
-   - 5-minute sliding window filter for geofence boundary oscillations and missed medication/hydration.
-   - One-click clinician actions: **Acknowledge**, **Resolve**, and **Dispatch Caregiver**.
-6. **Multilingual Dashboard UI**:
-   - Language selector supporting **English**, **Hindi**, **Assamese** (`as`), **Meitei/Manipuri** (`mn`), and **Bengali** (`bn`) with automatic English fallback.
-7. **Org-Wide Analytics & Automated At-Risk Detection**:
-   - Population distribution across Early, Moderate, and Severe stages.
-   - Early warning system detecting $>15\%$ accuracy drops, $>30\%$ latency spikes, or $<60\%$ adherence.
-8. **Auth, RBAC & GDPR Compliance**:
-   - JWT authentication + refresh rotation.
-   - Role-Based Access Control (`Admin`, `Healthcare Worker`, `Caregiver`).
-   - **Explicit Revocable GPS Consent**: Patients/Guardians can revoke location tracking, immediately pausing GPS ingestion.
-   - **Permanent GDPR Hard Deletion**: Full right-to-be-forgotten path with confirmation safety lock (`PERMANENT_DELETE`).
-9. **Interactive Sync Ingestion Simulator**:
-   - Built-in admin testing tool to simulate incoming batches from Praveen & Sanjit and test live ingestion.
+### Section 2: SANJIT — Geofencing, GPS & Offline Sync Engine (Core)
+- **Geofencing & Safe Zones Core**: Configurable safe zones (*Home 150m, Clinic 100m, Park 300m*) using the Haversine formula with a 5m hysteresis buffer to prevent perimeter jitter.
+- **GPS Telemetry & Battery-Conscious Polling**: Adaptive power modes (*High Accuracy 1s, Balanced 3s, Power Saver 8s*) and live walking trajectory simulations (*Safe Stroll, Wandering Breach, Boundary Oscillation*).
+- **5-Minute Sliding Window Alert Deduplicator**: Debounces rapid back-and-forth boundary crossings into a single consolidated alert summary, reducing clinician alarm fatigue.
+- **Offline Sync Queue Engine (`syncEngine`)**: Central write seam holding telemetry, cognitive scores, and records offline in IndexedDB/LocalStorage. Features exponential backoff retry ($1\text{s}, 2\text{s}, 4\text{s}, 8\text{s}\dots$) upon network reconnection.
+- **Conflict Resolution**: Last-Write-Wins (LWW) for telemetry and automated 3-way versioned merges for medical records with audit trail preservation.
 
 ---
 
-## 2. Directory Structure
+## 📜 Section 0 Shared Data Contract (`contract.ts`)
+
+```typescript
+export type GameType = "memory" | "attention" | "routine" | "pattern";
+export type DiagnosisStage = "early" | "moderate" | "severe";
+export type ReminderType = "medicine" | "hydration" | "activity" | "appointment";
+export type ReminderStatus = "acknowledged" | "snoozed" | "missed";
+export type GeofenceEventType = "enter" | "exit";
+export type EntityType = "game_session" | "geofence_event" | "reminder_ack" | "patient_record";
+
+export interface GameSession {
+  id: string;
+  patientId: string;
+  gameType: GameType;
+  startedAt: string;
+  endedAt: string;
+  score: number;
+  accuracy: number;
+  avgResponseTimeMs: number;
+  errorTypes: string[];
+  difficultyLevel: number;
+  moodAfter?: string;
+  synced: boolean;
+}
+
+export interface GeofenceEvent {
+  id: string;
+  patientId: string;
+  zoneId: string;
+  eventType: GeofenceEventType;
+  lat: number;
+  lng: number;
+  timestamp: string;
+  synced: boolean;
+}
+
+export interface ReminderAck {
+  id: string;
+  patientId: string;
+  reminderType: ReminderType;
+  scheduledAt: string;
+  ackedAt: string | null;
+  status: ReminderStatus;
+  synced: boolean;
+}
+
+export interface PatientRecord {
+  patientId: string;
+  name: string;
+  age: number;
+  diagnosisStage: DiagnosisStage;
+  medications: Array<{ id: string; name: string; dosage: string; schedule: string }>;
+  emergencyContacts: Array<{ name: string; relation: string; phone: string; isPrimary: boolean }>;
+  updatedBy: string;
+  updatedAt: string;
+  version: number;
+  history?: Array<{ version: number; updatedAt: string; updatedBy: string; changes: Record<string, any> }>;
+}
+
+export interface SyncQueueItem {
+  id: string;
+  entityType: EntityType;
+  payload: any;
+  createdAt: string;
+  synced: boolean;
+  retryCount: number;
+}
+```
+
+---
+
+## 🛠️ Project Structure
 
 ```
-├── shared/
-│   ├── contract.ts              # Exact Section 0 Data Contract & Types
-│   ├── sanjitSeam.ts            # Sanjit Sync & Geofence Seam (enqueue, flushQueue, getSyncStatus)
-│   ├── praveenSeam.ts           # Praveen Cognitive & Difficulty Engine Seam
-├── server/                      # Node.js/Express + TypeScript REST Backend
+gurugale-platform/
+├── server/                                # Backend Server (Central Ingestion & Shared API)
 │   ├── src/
-│   │   ├── controllers/         # Auth, Sync Ingestion, Patients, Geofence, Alerts, Analytics, Simulator
-│   │   ├── services/            # Store (with GDPR hard delete), Deduplication, Analytics
-│   │   ├── middlewares/         # JWT Auth & RBAC
-│   │   ├── routes/              # Express API Routes
-│   │   ├── data/seedData.ts     # Realistic multi-day seed dataset
-│   │   └── test-runner.ts       # 20-test Automated Verification Suite
-├── client/                      # React + Vite + Tailwind CSS Admin SPA
+│   │   ├── shared/contract.ts             # Shared Data Contract
+│   │   ├── modules/
+│   │   │   ├── sanjit/                    # Geofencing, Debouncing, Sync Queue Relay
+│   │   │   ├── praveen/                   # Cognitive rules & benchmarks
+│   │   │   └── nish/                      # Ingestion pipeline, records, analytics, GDPR
+│   │   └── index.ts
+│   └── package.json
+├── client/                                # React + Vite + Tailwind Platform
 │   ├── src/
-│   │   ├── views/               # Dashboard, PatientDetail (Scorecard), GeofenceMap, Records, Alerts, Analytics, Security, Login
-│   │   ├── components/          # Navbar (RBAC & Lang), Sidebar, EmptyState, AuditDiffModal, SimulatorModal
-│   │   ├── locales/             # Translations (EN, HI, AS, MN, BN)
-│   │   └── context/             # AuthContext (Role Switcher), LanguageContext
+│   │   ├── shared/contract.ts             # Shared Data Contract
+│   │   ├── modules/
+│   │   │   ├── sanjit/                    # SECTION 2: SANJIT (Geofence, GPS, Sync Engine)
+│   │   │   │   ├── geofenceEngine.ts      # Haversine distance, safe zones & boundary state machine
+│   │   │   │   ├── gpsTracker.ts          # Battery-conscious polling & GPS route simulator
+│   │   │   │   ├── alertDeduplicator.ts   # 5-min sliding window debounce & alert aggregator
+│   │   │   │   ├── syncEngine.ts          # Offline write queue, backoff retry & batch flush
+│   │   │   │   ├── conflictResolver.ts    # LWW & versioned 3-way record merge
+│   │   │   │   └── SanjitSectionView.tsx  # Interactive Geofence Map & Sync Inspector
+│   │   │   ├── praveen/                   # Cognitive Therapy Lab (Writes to Sanjit Sync Queue)
+│   │   │   └── nish/                      # Clinical Admin Suite & Ingestion Viewer
+│   │   ├── components/Navbar.tsx          # Global navigation & live sync status badge
+│   │   ├── locales/i18n.ts                # Multilingual (English, Hindi, Assamese, Meitei, Bengali)
+│   │   ├── App.tsx
+│   │   └── main.tsx
+│   └── package.json
+└── package.json
 ```
 
 ---
 
-## 3. Quick Start & Execution
+## 🏃 Getting Started
 
-### Install Dependencies
+### 1. Install & Build
 ```bash
-# Server
+# Install & Build Server
 cd server
 npm install
+npm run build
 
-# Client
+# Install & Build Client
 cd ../client
 npm install
+npm run build
 ```
 
-### Run Server & Client
+### 2. Run Development Mode
 ```bash
-# In terminal 1 (Backend on http://localhost:5000)
-cd server
-npm run dev
+# Start Backend Server (Port 3001)
+npm run dev:server
 
-# In terminal 2 (Frontend on http://localhost:3000)
-cd client
-npm run dev
-```
-
-### Run Automated Verification Test Suite
-```bash
-cd server
-npm run test
+# Start Vite Frontend (Port 5173)
+npm run dev:client
 ```

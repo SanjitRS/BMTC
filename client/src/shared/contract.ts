@@ -105,3 +105,12 @@ export interface DebouncedAlert {
   summary: string;
   dispatched: boolean;
 }
+
+export interface SyncStatus {
+  totalPending: number;
+  totalSynced: number;
+  isOnline: boolean;
+  isSyncing: boolean;
+  lastSyncTime: string | null;
+  lastError: string | null;
+}

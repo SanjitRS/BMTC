@@ -1,239 +1,413 @@
-export type SupportedLanguage = 'en' | 'hi' | 'as' | 'mn' | 'bn';
+export type Language = "en" | "hi" | "as" | "mn" | "bn";
 
-export interface LanguageOption {
-  code: SupportedLanguage;
-  name: string;
-  nativeName: string;
-  flag: string;
+export interface Translations {
+  appName: string;
+  tagline: string;
+  modules: {
+    sanjit: string;
+    sanjitSubtitle: string;
+    praveen: string;
+    praveenSubtitle: string;
+    nish: string;
+    nishSubtitle: string;
+    architecture: string;
+  };
+  geofence: {
+    title: string;
+    safeZones: string;
+    currentLocation: string;
+    status: string;
+    insideSafeZone: string;
+    outsideSafeZone: string;
+    breachAlert: string;
+    startSimulation: string;
+    pauseSimulation: string;
+    resetRoute: string;
+    simulateOscillation: string;
+    batteryMode: string;
+    highAccuracy: string;
+    balanced: string;
+    powerSaver: string;
+    slidingWindowSummary: string;
+  };
+  sync: {
+    title: string;
+    queueStatus: string;
+    pending: string;
+    synced: string;
+    flushNow: string;
+    networkStatus: string;
+    online: string;
+    offline: string;
+    simulateOffline: string;
+    simulateOnline: string;
+  };
+  cognitive: {
+    title: string;
+    memoryTitle: string;
+    attentionTitle: string;
+    routineTitle: string;
+    patternTitle: string;
+    difficultyLevel: string;
+    adaptiveEngineActive: string;
+    score: string;
+    accuracy: string;
+    reactionTime: string;
+    checkInMood: string;
+    reminderTitle: string;
+  };
+  admin: {
+    title: string;
+    roster: string;
+    scorecard: string;
+    recordsAudit: string;
+    alertCenter: string;
+    orgAnalytics: string;
+    gdprSecurity: string;
+    consentActive: string;
+    emergencyDispatch: string;
+  };
 }
 
-export const SUPPORTED_LANGUAGES: LanguageOption[] = [
-  { code: 'en', name: 'English', nativeName: 'English', flag: '🇬🇧' },
-  { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳' },
-  { code: 'as', name: 'Assamese (NER)', nativeName: 'অসমীয়া', flag: '🌿' },
-  { code: 'mn', name: 'Manipuri / Meitei (NER)', nativeName: 'মৈতৈলোন্', flag: '🏔️' },
-  { code: 'bn', name: 'Bengali', nativeName: 'বাংলা', flag: '🌸' }
-];
-
-export const translations: Record<SupportedLanguage, Record<string, string>> = {
+export const translations: Record<Language, Translations> = {
   en: {
-    'app.title': 'Gurugale Dementia Care Platform',
-    'app.subtitle': 'Clinical Administration & Ingestion Pipeline',
-    'nav.dashboard': 'Dashboard',
-    'nav.patients': 'Patient Roster',
-    'nav.scorecard': 'Therapy Scorecards',
-    'nav.geofence': 'Geofence Map',
-    'nav.records': 'Patient Records',
-    'nav.alerts': 'Alert Center',
-    'nav.analytics': 'Org Analytics',
-    'nav.consent': 'Privacy & Consent',
-    'nav.simulator': 'Sync Simulator',
-    'role.admin': 'Clinical Admin',
-    'role.healthcare_worker': 'Healthcare Worker',
-    'role.caregiver': 'Caregiver',
-    'status.improving': 'Improving',
-    'status.stable': 'Stable',
-    'status.declining': 'Declining',
-    'status.active': 'Active',
-    'status.acknowledged': 'Acknowledged',
-    'status.resolved': 'Resolved',
-    'stats.total_patients': 'Total Patients',
-    'stats.active_alerts': 'Active Alerts',
-    'stats.critical_alerts': 'Critical Breaches',
-    'stats.avg_accuracy': 'Avg Therapy Accuracy',
-    'stats.total_sessions': 'Total Game Sessions',
-    'table.patient_name': 'Patient Name',
-    'table.stage': 'Diagnosis Stage',
-    'table.cognitive_status': 'Cognitive Trend',
-    'table.accuracy': 'Accuracy',
-    'table.streak': 'Streak',
-    'table.actions': 'Actions',
-    'btn.view_scorecard': 'View Scorecard',
-    'btn.edit_record': 'Edit Record',
-    'btn.acknowledge': 'Acknowledge',
-    'btn.resolve': 'Resolve',
-    'btn.dispatch': 'Dispatch Caregiver',
-    'btn.save_changes': 'Save Changes',
-    'btn.cancel': 'Cancel',
-    'btn.audit_history': 'Audit History',
-    'btn.revoke_consent': 'Revoke GPS Consent',
-    'btn.grant_consent': 'Grant GPS Consent',
-    'btn.gdpr_delete': 'Execute GDPR Erasure',
-    'btn.simulate_sync': 'Simulate Sync Batch',
-    'empty.no_sessions_title': 'No Cognitive Sessions Recorded Yet',
-    'empty.no_sessions_desc': 'This patient is newly enrolled. Once they complete therapy games on their tablet, cognitive trend lines and accuracy metrics will automatically render here.',
-    'empty.no_alerts_title': 'No Active Safety Alerts',
-    'empty.no_alerts_desc': 'All patients are currently inside safe geofence zones and taking medications on schedule.',
-    'alert.breach_title': 'Geofence Breach',
-    'alert.missed_med_title': 'Missed Medication',
-    'chart.score_accuracy': 'Score & Accuracy Progression',
-    'chart.latency': 'Average Response Latency (ms)',
-    'chart.game_performance': 'Performance by Game Type',
-    'chart.error_distribution': 'Error Type Distribution',
-    'audit.version_history': 'Patient Record Version History & Audit Trail',
-    'audit.prior_snapshot': 'Previous Snapshot',
-    'audit.updated_by': 'Updated by',
-    'audit.version': 'Version'
+    appName: "Gurugale",
+    tagline: "Empowering Dementia Care with Geofencing, Cognitive Therapy & Offline Sync",
+    modules: {
+      sanjit: "Sanjit: Geofence & Offline Sync",
+      sanjitSubtitle: "Real-Time GPS Tracking, 5-Min Sliding Window Debounce & Offline Queue Engine",
+      praveen: "Praveen: Cognitive Therapy",
+      praveenSubtitle: "Adaptive Difficulty Lab, NER Cultural Games & Memory Matrix",
+      nish: "Nischal: Clinical Admin Portal",
+      nishSubtitle: "Central Ingestion Pipeline, Audit Trail & GDPR Compliance",
+      architecture: "System Architecture",
+    },
+    geofence: {
+      title: "Geofencing & GPS Telemetry Suite",
+      safeZones: "Configured Safe Zones",
+      currentLocation: "Patient Real-Time Location",
+      status: "Perimeter Status",
+      insideSafeZone: "INSIDE SAFE ZONE",
+      outsideSafeZone: "SAFE ZONE BREACH DETECTED",
+      breachAlert: "Immediate Attention: Perimeter boundary crossed!",
+      startSimulation: "Walk Simulation",
+      pauseSimulation: "Pause",
+      resetRoute: "Reset Route",
+      simulateOscillation: "Trigger Rapid Oscillation (Debounce Test)",
+      batteryMode: "GPS Polling Mode",
+      highAccuracy: "High Accuracy (1s)",
+      balanced: "Balanced (5s)",
+      powerSaver: "Power Saver (15s)",
+      slidingWindowSummary: "5-Minute Sliding Window Debounce Active",
+    },
+    sync: {
+      title: "Offline Sync Queue Engine",
+      queueStatus: "Sync Queue Status",
+      pending: "Pending Upload",
+      synced: "Synced to Server",
+      flushNow: "Flush Queue (POST /api/sync/batch)",
+      networkStatus: "Network State",
+      online: "ONLINE (Connected to Server)",
+      offline: "OFFLINE (Queuing Locally)",
+      simulateOffline: "Simulate Offline Mode",
+      simulateOnline: "Restore Online Mode",
+    },
+    cognitive: {
+      title: "Cognitive Therapy Lab",
+      memoryTitle: "Visual Memory & Face-Name",
+      attentionTitle: "Selective Attention & Focus",
+      routineTitle: "Daily Routine Sequencing",
+      patternTitle: "NER Cultural Pattern Recall",
+      difficultyLevel: "Adaptive Level",
+      adaptiveEngineActive: "Dynamic Difficulty Matrix Active",
+      score: "Session Score",
+      accuracy: "Accuracy",
+      reactionTime: "Avg Reaction Time",
+      checkInMood: "Post-Session Mood Check",
+      reminderTitle: "Daily Living Reminders",
+    },
+    admin: {
+      title: "Clinical Command & Ingestion Center",
+      roster: "Patient Roster",
+      scorecard: "Cognitive Scorecards",
+      recordsAudit: "Versioned Medical Audit Log",
+      alertCenter: "Deduplicated Alert Stream",
+      orgAnalytics: "Ecosystem Analytics",
+      gdprSecurity: "GDPR & Privacy Consent",
+      consentActive: "GPS Telemetry Consent Granted",
+      emergencyDispatch: "1-Click Caregiver Dispatch",
+    },
   },
   hi: {
-    'app.title': 'गुरुगले डिमेंशिया केयर प्लेटफॉर्म',
-    'app.subtitle': 'क्लिनिकल एडमिनिस्ट्रेशन एवं सिंक पाइपलाइन',
-    'nav.dashboard': 'डैशबोर्ड',
-    'nav.patients': 'मरीज़ सूची',
-    'nav.scorecard': 'थेरेपी स्कोरकार्ड',
-    'nav.geofence': 'जियोफेंस मानचित्र',
-    'nav.records': 'मरीज़ रिकॉर्ड्स',
-    'nav.alerts': 'अलर्ट केंद्र',
-    'nav.analytics': 'समग्र विश्लेषण',
-    'nav.consent': 'गोपनीयता एवं सहमति',
-    'nav.simulator': 'सिंक सिम्युलेटर',
-    'role.admin': 'क्लिनिकल एडमिन',
-    'role.healthcare_worker': 'स्वास्थ्य कार्यकर्ता',
-    'role.caregiver': 'देखभालकर्ता',
-    'status.improving': 'सुधार हो रहा है',
-    'status.stable': 'स्थिर',
-    'status.declining': 'गिरावट',
-    'status.active': 'सक्रिय',
-    'status.acknowledged': 'स्वीकृत',
-    'status.resolved': 'हल किया गया',
-    'stats.total_patients': 'कुल मरीज़',
-    'stats.active_alerts': 'सक्रिय अलर्ट',
-    'stats.critical_alerts': 'गंभीर उल्लंघन',
-    'stats.avg_accuracy': 'औसत सटीकता',
-    'stats.total_sessions': 'कुल सत्र',
-    'table.patient_name': 'मरीज़ का नाम',
-    'table.stage': 'रोग चरण',
-    'table.cognitive_status': 'संज्ञानात्मक रुझान',
-    'table.accuracy': 'सटीकता',
-    'table.streak': 'लगातार दिन',
-    'table.actions': 'कार्रवाई',
-    'btn.view_scorecard': 'स्कोरकार्ड देखें',
-    'btn.edit_record': 'रिकॉर्ड संपादित करें',
-    'btn.acknowledge': 'स्वीकार करें',
-    'btn.resolve': 'हल करें',
-    'btn.dispatch': 'देखभालकर्ता भेजें',
-    'btn.save_changes': 'सहेजें',
-    'btn.cancel': 'रद्द करें',
-    'btn.audit_history': 'ऑडिट इतिहास',
-    'btn.revoke_consent': 'GPS सहमति रद्द करें',
-    'btn.grant_consent': 'GPS सहमति प्रदान करें',
-    'btn.gdpr_delete': 'GDPR डेटा हटाएं',
-    'btn.simulate_sync': 'सिंक सिमुलेशन करें',
-    'empty.no_sessions_title': 'अभी तक कोई सत्र दर्ज नहीं किया गया',
-    'empty.no_sessions_desc': 'यह मरीज़ नया है। जब वे खेल पूरा करेंगे, तो प्रगति चार्ट यहाँ दिखाई देगा।',
-    'empty.no_alerts_title': 'कोई सक्रिय अलर्ट नहीं',
-    'empty.no_alerts_desc': 'सभी मरीज़ सुरक्षित क्षेत्रों में हैं और समय पर दवाएं ले रहे हैं।'
+    appName: "गुरुगले",
+    tagline: "जियोफेंसिंग, संज्ञानात्मक थेरेपी और ऑफलाइन सिंक के साथ डिमेंशिया देखभाल",
+    modules: {
+      sanjit: "संजीत: जियोफेंस और ऑफलाइन सिंक",
+      sanjitSubtitle: "रीयल-टाइम जीपीएस, 5-मिनट स्लाइडिंग विंडो डिबाउंस और सिंक कतार",
+      praveen: "प्रवीण: संज्ञानात्मक थेरेपी",
+      praveenSubtitle: "अनुकूली कठिनाई लैब और पूर्वोत्तर सांस्कृतिक खेल",
+      nish: "निश्चल: क्लिनिकल एडमिन पोर्टल",
+      nishSubtitle: "केंद्रीय अंतर्ग्रहण पाइपलाइन और जीडीपीआर सुरक्षा",
+      architecture: "सिस्टम आर्किटेक्चर",
+    },
+    geofence: {
+      title: "जियोफेंसिंग और जीपीएस टेलीमेट्री सूट",
+      safeZones: "सुरक्षित क्षेत्र (Safe Zones)",
+      currentLocation: "मरीज की वर्तमान स्थिति",
+      status: "परिधि स्थिति",
+      insideSafeZone: "सुरक्षित क्षेत्र के अंदर",
+      outsideSafeZone: "सुरक्षित क्षेत्र का उल्लंघन!",
+      breachAlert: "चेतावनी: मरीज सुरक्षित सीमा से बाहर चला गया है!",
+      startSimulation: "सिमुलेशन शुरू करें",
+      pauseSimulation: "रोकें",
+      resetRoute: "रूट रीसेट करें",
+      simulateOscillation: "सीमा दोलन सिमुलेट करें (Debounce Test)",
+      batteryMode: "जीपीएस पोलिंग मोड",
+      highAccuracy: "उच्च सटीकता (1s)",
+      balanced: "संतुलित (5s)",
+      powerSaver: "बैटरी सेवर (15s)",
+      slidingWindowSummary: "5-मिनट स्लाइडिंग विंडो सक्रिय",
+    },
+    sync: {
+      title: "ऑफलाइन सिंक कतार इंजन",
+      queueStatus: "सिंक स्थिति",
+      pending: "लंबित अपलोड",
+      synced: "सर्वर पर सिंक किया गया",
+      flushNow: "अभी सिंक करें (POST /api/sync/batch)",
+      networkStatus: "नेटवर्क स्थिति",
+      online: "ऑनलाइन (सर्वर कनेक्टेड)",
+      offline: "ऑफलाइन (स्थानीय स्टोरेज)",
+      simulateOffline: "ऑफलाइन मोड चालू करें",
+      simulateOnline: "ऑनलाइन मोड चालू करें",
+    },
+    cognitive: {
+      title: "संज्ञानात्मक थेरेपी लैब",
+      memoryTitle: "स्मृति अभ्यास",
+      attentionTitle: "एकाग्रता और ध्यान",
+      routineTitle: "दैनिक दिनचर्या क्रम",
+      patternTitle: "पूर्वोत्तर सांस्कृतिक पैटर्न",
+      difficultyLevel: "कठिनाई स्तर",
+      adaptiveEngineActive: "अनुकूली नियम सक्रिय",
+      score: "स्कोर",
+      accuracy: "सटीकता",
+      reactionTime: "प्रतिक्रिया समय",
+      checkInMood: "मूड जांचें",
+      reminderTitle: "दवा व दैनिक स्मरण",
+    },
+    admin: {
+      title: "क्लिनिकल प्रबंधन केंद्र",
+      roster: "मरीज सूची",
+      scorecard: "संज्ञानात्मक स्कोरकार्ड",
+      recordsAudit: "संस्करण मेडिकल ऑडिट",
+      alertCenter: "अलर्ट केंद्र",
+      orgAnalytics: "संगठन विश्लेषण",
+      gdprSecurity: "जीडीपीआर व सहमति",
+      consentActive: "जीपीएस ट्रैकिंग सहमति स्वीकृत",
+      emergencyDispatch: "आपातकालीन देखभालकर्ता प्रेषण",
+    },
   },
   as: {
-    'app.title': 'গুৰুগলে ডিমেনচিয়া কেয়াৰ প্লেটফৰ্ম',
-    'app.subtitle': 'ক্লিনিকেল প্ৰশাসন আৰু ইনজেচন পাইপলাইন',
-    'nav.dashboard': 'ডেচবৰ্ড',
-    'nav.patients': 'ৰোগীৰ তালিকা',
-    'nav.scorecard': 'থেৰাপী স্কোৰকাৰ্ড',
-    'nav.geofence': 'জিওফেন্স মেপ',
-    'nav.records': 'ৰোগীৰ তথ্য',
-    'nav.alerts': 'সতৰ্কতা কেন্দ্ৰ',
-    'nav.analytics': 'সামগ্ৰিক বিশ্লেষণ',
-    'nav.consent': 'গোপনীয়তা আৰু সন্মতি',
-    'nav.simulator': 'চিঙ্ক অনুৰূপক',
-    'role.admin': 'ক্লিনিকেল এডমিন',
-    'role.healthcare_worker': 'স্বাস্থ্যকৰ্মী',
-    'role.caregiver': 'সেৱা আগবঢ়োৱা ব্যক্তি',
-    'status.improving': 'উন্নতি হৈছে',
-    'status.stable': 'স্থিৰ',
-    'status.declining': 'অৱনতি ঘটিছে',
-    'status.active': 'সক্ৰিয়',
-    'status.acknowledged': 'স্বীকৃত',
-    'status.resolved': 'সমাধান হ’ল',
-    'stats.total_patients': 'মুঠ ৰোগী',
-    'stats.active_alerts': 'সক্ৰিয় সতৰ্কবাৰ্তা',
-    'stats.critical_alerts': 'গুৰুতৰ সীমা লঙ্ঘন',
-    'stats.avg_accuracy': 'গড় নিৰ্ভুলতা',
-    'stats.total_sessions': 'মুঠ খেলৰ অধিৱেশন',
-    'table.patient_name': 'ৰোগীৰ নাম',
-    'table.stage': 'ৰোগৰ পৰ্যায়',
-    'table.cognitive_status': 'মানসিক অৱস্থাৰ ধাৰা',
-    'table.accuracy': 'নিৰ্ভুলতা',
-    'table.streak': 'ধাৰাবাহিকতা',
-    'table.actions': 'পদক্ষেপ',
-    'btn.view_scorecard': 'স্কোৰকাৰ্ড চাওক',
-    'btn.edit_record': 'তথ্য সম্পাদনা কৰক',
-    'btn.acknowledge': 'স্বীকাৰ কৰক',
-    'btn.resolve': 'সমাধান কৰক',
-    'btn.dispatch': 'সেৱাকৰ্মী প্ৰেৰণ কৰক',
-    'btn.save_changes': 'সংৰক্ষণ কৰক',
-    'btn.cancel': 'বাতিল কৰক',
-    'btn.audit_history': 'অডিট ইতিহাস',
-    'btn.revoke_consent': 'GPS সন্মতি প্ৰত্যাহাৰ কৰক',
-    'btn.grant_consent': 'GPS সন্মতি দিয়ক',
-    'btn.gdpr_delete': 'স্থায়ী তথ্য বিলোপ (GDPR)',
-    'btn.simulate_sync': 'চিঙ্ক অনুৰূপ কৰক',
-    'empty.no_sessions_title': 'এতিয়ালৈকে কোনো খেলৰ তথ্য নাই',
-    'empty.no_sessions_desc': 'ৰোগীজনে প্ৰথমবাৰৰ বাবে খেল সম্পূৰ্ণ কৰিলে ইয়াত ফলাফল দেখা যাব।'
+    appName: "গুৰুগলে (Gurugale)",
+    tagline: "ডিমেনচিয়া যত্ন, জিঅ'ফেন্সিং আৰু অফলাইন সিংকিং প্লেটফৰ্ম",
+    modules: {
+      sanjit: "সঞ্জীত: জিঅ'ফেন্স আৰু অফলাইন সিংক",
+      sanjitSubtitle: "প্ৰকৃত সময়ৰ জিপিএছ, ৫ মিনিটৰ ডিবাউন্স আৰু সিংক ইঞ্জিন",
+      praveen: "প্ৰবীণ: কগনিটিভ থেৰাপী",
+      praveenSubtitle: "অসম আৰু উত্তৰ-পূবৰ সাংস্কৃতিক খেল আৰু স্মৃতি পৰীক্ষা",
+      nish: "নিশ্চল: ক্লিনিকেল এডমিন প'ৰ্টেল",
+      nishSubtitle: "কেন্দ্ৰীয় তথ্য গ্ৰহণ আৰু জিডিপিআৰ নিৰাপত্তা",
+      architecture: "প্ৰণালী স্থাপত্য",
+    },
+    geofence: {
+      title: "জিঅ'ফেন্সিং আৰু জিপিএছ পৰীক্ষা",
+      safeZones: "সুৰক্ষিত মণ্ডল",
+      currentLocation: "ৰোগীৰ বৰ্তমান স্থান",
+      status: "অৱস্থা",
+      insideSafeZone: "সুৰক্ষিত এলেকাৰ ভিতৰত",
+      outsideSafeZone: "সুৰক্ষিত এলেকাৰ বাহিৰত!",
+      breachAlert: "সতৰ্কবাণী: ৰোগীয়ে সুৰক্ষিত সীমা পাৰ কৰিছে!",
+      startSimulation: "যাত্ৰা আৰম্ভ কৰক",
+      pauseSimulation: "ৰখাওক",
+      resetRoute: "পুনৰ সংহতি",
+      simulateOscillation: "সীমা কম্পন পৰীক্ষা (Debounce)",
+      batteryMode: "জিপিএছ ম'ড",
+      highAccuracy: "উচ্চ সঠিকতা (1s)",
+      balanced: "ভাৰসাম্য (5s)",
+      powerSaver: "বেটাৰী ৰাহি (15s)",
+      slidingWindowSummary: "৫ মিনিটৰ স্লাইডিং উইণ্ড' সক্ৰিয়",
+    },
+    sync: {
+      title: "অফলাইন সিংক কিউ ইঞ্জিন",
+      queueStatus: "সিংক অৱস্থা",
+      pending: "জমাকৃত তথ্য",
+      synced: "চাৰ্ভাৰত সংৰক্ষিত",
+      flushNow: "এতিয়াই সিংক কৰক",
+      networkStatus: "নেটৱৰ্ক স্থিতি",
+      online: "অনলাইন (সংযুক্ত)",
+      offline: "অফলাইন (স্থানীয়)",
+      simulateOffline: "অফলাইন ম'ড",
+      simulateOnline: "অনলাইন ম'ড",
+    },
+    cognitive: {
+      title: "কগনিটিভ থেৰাপী লেব",
+      memoryTitle: "স্মৃতি অনুশীলন (বিহু, জাপি)",
+      attentionTitle: "মনোযোগ পৰীক্ষা",
+      routineTitle: "দৈনন্দিন কামৰ ক্ৰম",
+      patternTitle: "উত্তৰ-পূৰ্বাঞ্চলৰ সাংস্কৃতিক স্মৃতি",
+      difficultyLevel: "স্তৰ",
+      adaptiveEngineActive: "অভিযোজিত নিয়ম সক্ৰিয়",
+      score: "স্ক'ৰ",
+      accuracy: "সঠিকতা",
+      reactionTime: "সঁহাৰিৰ সময়",
+      checkInMood: "মনৰ ভাব পৰীক্ষা",
+      reminderTitle: "দৈনিক সোঁৱৰণি",
+    },
+    admin: {
+      title: "প্ৰশাসন আৰু তথ্য সংগ্ৰহ কেন্দ্ৰ",
+      roster: "ৰোগীৰ তালিকা",
+      scorecard: "স্বাস্থ্য ৰেখাচিত্ৰ",
+      recordsAudit: "চিকিৎসা নথিৰ ইতিবৃত্ত",
+      alertCenter: "সতৰ্কতা কেন্দ্ৰ",
+      orgAnalytics: "সামগ্ৰিক বিশ্লেষণ",
+      gdprSecurity: "গোপনীয়তা আৰু সম্মতি",
+      consentActive: "জিপিএছ অনুসৰণ সন্মতি প্ৰদান কৰা হৈছে",
+      emergencyDispatch: "জৰুৰী সহায় প্ৰেৰণ",
+    },
   },
   mn: {
-    'app.title': 'গুরুগলে ডিমেনশিয়া কেয়ার প্লেটফর্ম',
-    'app.subtitle': 'ক্লিনিকেল এডমিনিস্ট্রেশন অমসুং সিঙ্ক পাইপলাইন',
-    'nav.dashboard': 'ডেশবোর্ড',
-    'nav.patients': 'অনাবাশিংগী পরিং',
-    'nav.scorecard': 'থেরাপী স্কোরকার্ড',
-    'nav.geofence': 'জিওফেন্স মেপ',
-    'nav.records': 'অনাবাগী রেকর্ডশিং',
-    'nav.alerts': 'চেকশিনৱা কেন্দ্র',
-    'nav.analytics': 'অপুনবা এনালিটিক্স',
-    'nav.consent': 'লোননা থম্বা অমসুং য়ানবা',
-    'nav.simulator': 'সিঙ্ক সিমুলেটর',
-    'role.admin': 'ক্লিনিকেল এডমিন',
-    'role.healthcare_worker': 'হেল্থকেয়ার ৱার্কার',
-    'role.caregiver': 'য়োকখৎপীবা',
-    'status.improving': 'ফগৎলকপগী ফিভম',
-    'status.stable': 'লেংদনা লৈবা',
-    'status.declining': 'হন্থরকপগী ফিভম',
-    'stats.total_patients': 'অপুনবা অনাবা',
-    'stats.active_alerts': 'হৌজিক লৈরিবা চেকশিনৱা',
-    'table.patient_name': 'অনাবাগী মিং',
-    'table.stage': 'লায়নাগী থাক',
-    'btn.view_scorecard': 'স্কোরকার্ড য়েংবা',
-    'btn.acknowledge': 'য়ানবা উৎপা',
-    'btn.dispatch': 'য়োকখৎপিবাদা পাউ তাকপা'
+    appName: "গুরুগলে (Gurugale)",
+    tagline: "লৈতেং ডিমেন্সিয়া লাইয়েং অমসুং জিওফেন্সিং প্লেটফর্ম",
+    modules: {
+      sanjit: "সংজিৎ: জিওফেন্স অমসুং অফলাইন সিংক",
+      sanjitSubtitle: "জিপিএস ট্রেক তৌবা অমসুং ৫-মিনিট দিবাউন্স ইঞ্জিন",
+      praveen: "প্রবীণ: কগনিটিভ থেরাপী",
+      praveenSubtitle: "মণিপুরি লোকতাক অমসুং রাসলিলী কগনিটিভ সেন্তর",
+      nish: "নিশ্চল: ক্লিনিক্যাল এদমিন পোর্তেল",
+      nishSubtitle: "সেন্ত্রেল ইনজেসন অমসুং জিডিপিআর য়োকখৎপা",
+      architecture: "সিস্তেম আর্কিতেকচর",
+    },
+    geofence: {
+      title: "জিওফেন্সিং অমসুং জিপিএস সেন্তর",
+      safeZones: "কনবা মফমশিং",
+      currentLocation: "অনাবা মীওইগী হৌজিক লৈরিবা মফম",
+      status: "ফীভম",
+      insideSafeZone: "কনবা মফমগী মনুংদা",
+      outsideSafeZone: "কনবা মফমগী মপান্দা লৈরে!",
+      breachAlert: "চেকশিনবা: অনাবা মীওই অদু কনবা ঙমখৈ লানখ্রে!",
+      startSimulation: "চৎপা হৌবা",
+      pauseSimulation: "লেপপা",
+      resetRoute: "অমুক হন্না হৌবা",
+      simulateOscillation: "ঙমখৈ ওসিল্লেসন তেস্ত",
+      batteryMode: "জিপিএস মোদ",
+      highAccuracy: "হাই এক্যুরেসি (1s)",
+      balanced: "বেলেন্সত (5s)",
+      powerSaver: "বেক অপ (15s)",
+      slidingWindowSummary: "৫-মিনিট স্লাইদিং ৱিন্দো এক্তিভ",
+    },
+    sync: {
+      title: "অফলাইন সিংক কিউ ইঞ্জিন",
+      queueStatus: "সিংক ফীভম",
+      pending: "আপলোদ তৌদ্রিবা",
+      synced: "সর্বারদা থমখ্রে",
+      flushNow: "হৌজিক সিংক তৌবা",
+      networkStatus: "নেতৱার্ক ফীভম",
+      online: "অনলাইন",
+      offline: "অফলাইন",
+      simulateOffline: "অফলাইন তৌবা",
+      simulateOnline: "অনলাইন তৌবা",
+    },
+    cognitive: {
+      title: "কগনিটিভ থেরাপী লেব",
+      memoryTitle: "মণিপুরি নীংশিংবা (লোকতাক, পেন্না)",
+      attentionTitle: "পুন্সিদা মীৎয়েং থম্বা",
+      routineTitle: "নোংমগী থবকশিং",
+      patternTitle: "সংস্কৃতিগী মতৌশিং",
+      difficultyLevel: "থাক",
+      adaptiveEngineActive: "এদাপ্তিভ রুল এক্তিভ",
+      score: "স্কোর",
+      accuracy: "চুম্বা",
+      reactionTime: "পাউখুম পীবগী মতম",
+      checkInMood: "মীনুংশি য়েংবা",
+      reminderTitle: "হীদাক নীংশিংবা",
+    },
+    admin: {
+      title: "ক্লিনিক্যাল এদমিন সেন্তর",
+      roster: "অনাবা মীওইগী মিংচেন",
+      scorecard: "থেরাপী স্কোরকার্দ",
+      recordsAudit: "অনাবা মীওইগী লাইয়েক ওদিত",
+      alertCenter: "চেকশিনৱা সেন্তর",
+      orgAnalytics: "সংগঠন এনালিতিক্স",
+      gdprSecurity: "জিডিপিআর সেক্যুরিতি",
+      consentActive: "জিপিএস ত্রেকিং কন্সেন্ত পীখ্রে",
+      emergencyDispatch: "ইমর্জেন্সী কেয়ারগীভর খঙহনবা",
+    },
   },
   bn: {
-    'app.title': 'গুরুগলে ডিমেনশিয়া কেয়ার প্ল্যাটফর্ম',
-    'app.subtitle': 'ক্লিনিকাল অ্যাডমিনিস্ট্রেশন ও ইনজেশন পাইপলাইন',
-    'nav.dashboard': 'ড্যাশবোর্ড',
-    'nav.patients': 'রোগীদের তালিকা',
-    'nav.scorecard': 'থেরাপি স্কোরকার্ড',
-    'nav.geofence': 'জিওফেন্স মানচিত্র',
-    'nav.records': 'রোগীর রেকর্ড',
-    'nav.alerts': 'সতর্কতা কেন্দ্র',
-    'nav.analytics': 'সামগ্রিক বিশ্লেষণ',
-    'nav.consent': 'গোপনীয়তা ও সম্মতি',
-    'nav.simulator': 'সিঙ্ক সিমুলেটর',
-    'role.admin': 'ক্লিনিকাল অ্যাডমিন',
-    'role.healthcare_worker': 'স্বাস্থ্যকর্মী',
-    'role.caregiver': 'সেবাকারী',
-    'status.improving': 'উন্নতি হচ্ছে',
-    'status.stable': 'স্থিতিশীল',
-    'status.declining': 'অবনতি হচ্ছে',
-    'stats.total_patients': 'মোট রোগী',
-    'stats.active_alerts': 'সক্রিয় সতর্কতা',
-    'table.patient_name': 'রোগীর নাম',
-    'table.stage': 'রোগের পর্যায়',
-    'btn.view_scorecard': 'স্কোরকার্ড দেখুন',
-    'btn.acknowledge': 'স্বীকার করুন',
-    'btn.save_changes': 'সংরক্ষণ করুন',
-    'btn.gdpr_delete': 'স্থায়ী ডেটা মুছে ফেলুন (GDPR)'
-  }
+    appName: "গুরুগলে (Gurugale)",
+    tagline: "ডিমেনশিয়া যত্ন, জিওফেন্সিং এবং অফলাইন সিঙ্ক প্ল্যাটফর্ম",
+    modules: {
+      sanjit: "সঞ্জিত: জিওফেন্স ও অফলাইন সিঙ্ক",
+      sanjitSubtitle: "লাইভ জিপিএস ট্র্যাকিং, ৫-মিনিট ডিবাউন্স এবং অফলাইন কিউ ইঞ্জিন",
+      praveen: "প্রবীণ: কগনিটিভ থেরাপি",
+      praveenSubtitle: "অ্যাডাপটিভ ডিফিকাল্টি ল্যাব ও সাংস্কৃতিক মেমরি ম্যাট্রিক্স",
+      nish: "নিশ্চল: ক্লিনিক্যাল অ্যাডমিন পোর্টাল",
+      nishSubtitle: "সেন্ট্রাল ইনজেশন পাইপলাইন এবং জিডিপিআর সুরক্ষা",
+      architecture: "সিস্টেম আর্কিটেকচার",
+    },
+    geofence: {
+      title: "জিওফেন্সিং ও জিপিএস টেলিমেট্রি স্যুট",
+      safeZones: "নিরাপদ অঞ্চল (Safe Zones)",
+      currentLocation: "রোগীর বর্তমান অবস্থান",
+      status: "সীমানা স্থিতি",
+      insideSafeZone: "নিরাপদ অঞ্চলের ভিতরে",
+      outsideSafeZone: "নিরাপদ অঞ্চলের বাইরে!",
+      breachAlert: "সতর্কবার্তা: রোগী নিরাপদ সীমানা অতিক্রম করেছেন!",
+      startSimulation: "সিমুলেশন শুরু",
+      pauseSimulation: "বিরতি",
+      resetRoute: "রুট রিসেট",
+      simulateOscillation: "সীমানা দোলন সিমুলেট করুন (Debounce Test)",
+      batteryMode: "জিপিএস পোলিং মোড",
+      highAccuracy: "উচ্চ নির্ভুলতা (1s)",
+      balanced: "ভারসাম্যপূর্ণ (5s)",
+      powerSaver: "ব্যাটারি সেভার (15s)",
+      slidingWindowSummary: "৫-মিনিট স্লাইডিং উইন্ডো সক্রিয়",
+    },
+    sync: {
+      title: "অফলাইন সিঙ্ক কিউ ইঞ্জিন",
+      queueStatus: "সিঙ্ক স্থিতি",
+      pending: "অপেক্ষমান আপলোড",
+      synced: "সার্ভারে সংরক্ষিত",
+      flushNow: "এখনই সিঙ্ক করুন",
+      networkStatus: "নেটওয়ার্ক স্থিতি",
+      online: "অনলাইন (সংযুক্ত)",
+      offline: "অফলাইন (স্থানীয় স্টোরেজ)",
+      simulateOffline: "অফলাইন মোড",
+      simulateOnline: "অনলাইন মোড",
+    },
+    cognitive: {
+      title: "কগনিটিভ থেরাপি ল্যাব",
+      memoryTitle: "স্মৃতি অনুশীলন",
+      attentionTitle: "মনোযোগ পরীক্ষা",
+      routineTitle: "দৈনন্দিন রুটিন ক্রম",
+      patternTitle: "সাংস্কৃতিক নকশা সনাক্তকরণ",
+      difficultyLevel: "কঠিনতা স্তর",
+      adaptiveEngineActive: "অভিযোজিত নিয়ম সক্রিয়",
+      score: "স্কোর",
+      accuracy: "নির্ভুলতা",
+      reactionTime: "প্রতিক্রিয়া সময়",
+      checkInMood: "মেজাজ পরীক্ষা",
+      reminderTitle: "দৈনিক অনুস্মারক",
+    },
+    admin: {
+      title: "ক্লিনিক্যাল অ্যাডমিন সেন্টার",
+      roster: "রোগীদের তালিকা",
+      scorecard: "থেরাপি স্কোরকার্ড",
+      recordsAudit: "মেডিকেল রেকর্ড অডিট",
+      alertCenter: "সতর্কতা কেন্দ্র",
+      orgAnalytics: "সংগঠন বিশ্লেষণ",
+      gdprSecurity: "জিডিপিআর এবং সম্মতি",
+      consentActive: "জিপিএস ট্র্যাকিং সম্মতি সক্রিয়",
+      emergencyDispatch: "জরুরি সেবা প্রেরণ",
+    },
+  },
 };
-
-/**
- * Returns translated string with fallback to English
- */
-export function translate(key: string, lang: SupportedLanguage = 'en'): string {
-  const langDict = translations[lang] || translations.en;
-  if (langDict[key]) {
-    return langDict[key];
-  }
-  // Fallback to English
-  return translations.en[key] || key;
-}

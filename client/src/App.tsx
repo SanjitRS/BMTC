@@ -1,147 +1,58 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from './context/AuthContext';
-import { useLanguage } from './context/LanguageContext';
-import { Navbar } from './components/Navbar';
-import { Sidebar, AdminTab } from './components/Sidebar';
-import { DashboardOverview } from './views/DashboardOverview';
-import { PatientDetailView } from './views/PatientDetailView';
-import { GeofenceMapView } from './views/GeofenceMapView';
-import { PatientRecordsView } from './views/PatientRecordsView';
-import { AlertCenterView } from './views/AlertCenterView';
-import { OrgAnalyticsView } from './views/OrgAnalyticsView';
-import { ConsentSecurityView } from './views/ConsentSecurityView';
-import { LoginView } from './views/LoginView';
-import { IngestionSimulatorModal } from './components/IngestionSimulatorModal';
-import { api } from './api/client';
+import React, { useState } from "react";
+import { Navbar } from "./components/Navbar";
+import { SanjitSectionView } from "./modules/sanjit/SanjitSectionView";
+import { PraveenSectionView } from "./modules/praveen/PraveenSectionView";
+import { NishSectionView } from "./modules/nish/NishSectionView";
+import { ArchitectureOverview } from "./components/ArchitectureOverview";
+import { Language } from "./locales/i18n";
 
-export const App: React.FC = () => {
-  const { isAuthenticated } = useAuth();
-  const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState<AdminTab>('overview');
-  const [selectedPatientId, setSelectedPatientId] = useState<string>('pat_001');
-  const [activeAlertsCount, setActiveAlertsCount] = useState<number>(3);
-  const [showSimulator, setShowSimulator] = useState<boolean>(false);
-  const [refreshKey, setRefreshKey] = useState<number>(0);
-
-  const fetchAlertsCount = () => {
-    api.getAlerts({ status: 'active' })
-      .then(alerts => setActiveAlertsCount(alerts.length))
-      .catch(console.error);
-  };
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchAlertsCount();
-      const interval = setInterval(fetchAlertsCount, 10000);
-      return () => clearInterval(interval);
-    }
-  }, [isAuthenticated]);
-
-  if (!isAuthenticated) {
-    return <LoginView />;
-  }
-
-  const handleSelectPatient = (id: string) => {
-    setSelectedPatientId(id);
-    setActiveTab('scorecard');
-  };
-
-  const handleRefreshAll = () => {
-    setRefreshKey(prev => prev + 1);
-    fetchAlertsCount();
-  };
+export function App() {
+  const [currentModule, setCurrentModule] = useState<"sanjit" | "praveen" | "nish" | "architecture">("sanjit");
+  const [currentLang, setCurrentLang] = useState<Language>("en");
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-blue-500 selection:text-white">
       {/* Top Navbar */}
       <Navbar
-        activeAlertsCount={activeAlertsCount}
-        onOpenSimulator={() => setShowSimulator(true)}
-        onNavigateAlerts={() => setActiveTab('alerts')}
+        currentModule={currentModule}
+        onModuleChange={setCurrentModule}
+        currentLang={currentLang}
+        onLanguageChange={setCurrentLang}
       />
 
-      {/* Main Layout */}
-      <div className="flex flex-1">
-        {/* Left Sidebar */}
-        <Sidebar
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          activeAlertsCount={activeAlertsCount}
-        />
+      {/* Main Container */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {currentModule === "sanjit" && (
+          <SanjitSectionView currentLang={currentLang} patientId="patient-101" />
+        )}
+        {currentModule === "praveen" && (
+          <PraveenSectionView currentLang={currentLang} patientId="patient-101" />
+        )}
+        {currentModule === "nish" && (
+          <NishSectionView currentLang={currentLang} />
+        )}
+        {currentModule === "architecture" && (
+          <ArchitectureOverview />
+        )}
+      </main>
 
-        {/* Dynamic Content Panel */}
-        <main className="flex-1 p-6 lg:p-8 max-w-7xl mx-auto w-full overflow-y-auto">
-          {activeTab === 'overview' && (
-            <DashboardOverview
-              key={refreshKey}
-              onSelectPatient={handleSelectPatient}
-              onNavigateTab={setActiveTab}
-            />
-          )}
-
-          {activeTab === 'roster' && (
-            <DashboardOverview
-              key={refreshKey}
-              onSelectPatient={handleSelectPatient}
-              onNavigateTab={setActiveTab}
-            />
-          )}
-
-          {activeTab === 'scorecard' && (
-            <PatientDetailView
-              key={refreshKey}
-              selectedPatientId={selectedPatientId}
-              onBackToRoster={() => setActiveTab('overview')}
-              onSelectPatient={setSelectedPatientId}
-              onOpenRecordEditor={() => setActiveTab('records')}
-            />
-          )}
-
-          {activeTab === 'geofence' && (
-            <GeofenceMapView
-              key={refreshKey}
-              selectedPatientId={selectedPatientId}
-              onSelectPatient={setSelectedPatientId}
-            />
-          )}
-
-          {activeTab === 'records' && (
-            <PatientRecordsView
-              key={refreshKey}
-              selectedPatientId={selectedPatientId}
-              onSelectPatient={setSelectedPatientId}
-            />
-          )}
-
-          {activeTab === 'alerts' && (
-            <AlertCenterView
-              key={refreshKey}
-              onRefreshAlertsCount={fetchAlertsCount}
-            />
-          )}
-
-          {activeTab === 'analytics' && (
-            <OrgAnalyticsView
-              key={refreshKey}
-              onSelectPatient={handleSelectPatient}
-            />
-          )}
-
-          {activeTab === 'security' && (
-            <ConsentSecurityView
-              key={refreshKey}
-              onRefreshData={handleRefreshAll}
-            />
-          )}
-        </main>
-      </div>
-
-      {/* Central Ingestion & Sync Simulator Modal */}
-      <IngestionSimulatorModal
-        isOpen={showSimulator}
-        onClose={() => setShowSimulator(false)}
-        onSuccess={handleRefreshAll}
-      />
+      {/* Modern Footer */}
+      <footer className="bg-slate-950 border-t border-slate-900 py-6 mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-500">
+          <div className="flex items-center space-x-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="font-semibold text-slate-400">Gurugale Dementia Care Platform</span>
+            <span>• Built for Section 2 (Sanjit), Section 1 (Praveen), Section 3 (Nischal)</span>
+          </div>
+          <div className="flex items-center space-x-4">
+            <span className="font-mono">Section 0 Shared Data Contract Certified</span>
+            <span>•</span>
+            <span className="text-slate-400 font-mono">Assam / NER Multi-Lingual Architecture</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
-};
+}
+
+export default App;

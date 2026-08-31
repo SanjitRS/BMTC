@@ -1,56 +1,80 @@
-import express from 'express';
-import cors from 'cors';
-import routes from './routes';
-import { config } from './config';
+import express, { Request, Response } from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import { nishRouter } from "./modules/nish/ingestionRouter";
+import { praveenRouter } from "./modules/praveen/cognitiveRouter";
+import { geofenceRelay } from "./modules/sanjit/geofenceRelay";
+import { syncRelay } from "./modules/sanjit/syncRelay";
+
+dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 3001;
 
-// Middlewares
-app.use(cors({ origin: config.corsOrigin, credentials: true }));
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(cors());
+app.use(express.json());
 
-// Request logger
-app.use((req, res, next) => {
-  const start = Date.now();
-  res.on('finish', () => {
-    const duration = Date.now() - start;
-    if (!req.path.includes('/health')) {
-      console.log(`[${new Date().toISOString()}] ${req.method} ${req.path} -> ${res.statusCode} (${duration}ms)`);
-    }
-  });
+// Request logging middleware
+app.use((req, _res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   next();
 });
 
 // Health check
-app.get('/health', (req, res) => {
+app.get("/api/health", (_req: Request, res: Response) => {
   res.json({
-    status: 'healthy',
-    service: 'Gurugale Central Ingestion & Admin Pipeline (Nischal Module)',
-    version: '2.0.0',
-    timestamp: new Date().toISOString()
+    status: "healthy",
+    platform: "Gurugale Multi-Modular Platform",
+    modules: ["sanjit:geofencing-sync", "praveen:cognitive-therapy", "nish:admin-ingestion"],
+    timestamp: new Date().toISOString(),
   });
 });
 
-// API Routes
-app.use('/api', routes);
+// SANJIT MODULE ENDPOINTS: Geofence & Safe Zones
+app.get("/api/geofence/zones", (_req: Request, res: Response) => {
+  res.json({ zones: geofenceRelay.getSafeZones() });
+});
 
-// Error handler
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('Unhandled server error:', err);
-  res.status(err.status || 500).json({
-    error: err.message || 'Internal Server Error',
-    timestamp: new Date().toISOString()
+app.post("/api/geofence/event", (req: Request, res: Response) => {
+  const event = req.body;
+  const result = geofenceRelay.processGeofenceEvent(event);
+  res.json({ success: true, ...result });
+});
+
+app.get("/api/geofence/events", (_req: Request, res: Response) => {
+  res.json({ events: geofenceRelay.getRawEvents() });
+});
+
+app.get("/api/geofence/alerts", (_req: Request, res: Response) => {
+  res.json({ alerts: geofenceRelay.getDebouncedAlerts() });
+});
+
+// Server-Sent Events (SSE) stream for live alerts
+app.get("/api/geofence/stream", (req: Request, res: Response) => {
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
+  const unsubscribe = geofenceRelay.subscribe((alert) => {
+    res.write(`data: ${JSON.stringify(alert)}\n\n`);
+  });
+
+  req.on("close", () => {
+    unsubscribe();
   });
 });
 
-const server = app.listen(config.port, () => {
-  console.log(`=======================================================`);
-  console.log(`🧠 GURUGALE ADMIN PIPELINE & INGESTION BACKEND READY`);
-  console.log(`🚀 Server listening on port http://localhost:${config.port}`);
-  console.log(`📥 Central Ingestion Endpoint: http://localhost:${config.port}/api/sync/batch`);
-  console.log(`🏥 Health Check: http://localhost:${config.port}/health`);
-  console.log(`=======================================================`);
-});
+// NISCHAL MODULE ENDPOINTS: Ingestion, Roster, Scorecards, GDPR
+app.use("/api", nishRouter);
 
-export default server;
+// PRAVEEN MODULE ENDPOINTS: Cognitive therapy benchmarks & rules
+app.use("/api/cognitive", praveenRouter);
+
+app.listen(PORT, () => {
+  console.log(`=========================================`);
+  console.log(` Gurugale Multi-Modular Backend Server `);
+  console.log(` Running on: http://localhost:${PORT}`);
+  console.log(` Central Ingestion: POST /api/sync/batch`);
+  console.log(` Geofence Stream: GET /api/geofence/stream`);
+  console.log(`=========================================`);
+});
