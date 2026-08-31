@@ -1,0 +1,20 @@
+runtime: nodejs20
+instance_class: F2
+
+automatic_scaling:
+  min_instances: 1
+  max_instances: 5
+
+env_variables:
+  NODE_ENV: 'production'
+  PORT: '8080'
+
+handlers:
+  # Static files
+  - url: /assets
+    static_dir: client/dist/assets
+
+  # API and server routing
+  - url: /.*
+    script: auto
+    secure: always

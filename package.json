@@ -5,9 +5,19 @@
   "scripts": {
     "dev:server": "cd server && npm run dev",
     "dev:client": "cd client && npm run dev",
-    "build": "cd server && npm run build && cd ../client && npm run build"
+    "build": "cd server && npm run build && cd ../client && npm run build",
+    "start": "node server/dist/index.js"
   },
-  "keywords": ["dementia-care", "geofencing", "offline-sync", "gps-telemetry", "haversine", "debouncing"],
-  "author": "Sanjit",
+  "keywords": [
+    "dementia-care",
+    "geofencing",
+    "offline-sync",
+    "gps-telemetry",
+    "haversine",
+    "debouncing",
+    "google-cloud",
+    "cloud-run"
+  ],
+  "author": "SanjitRS",
   "license": "MIT"
 }
