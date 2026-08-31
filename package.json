@@ -1,0 +1,11 @@
+{
+  "name": "gurugale-platform",
+  "version": "1.0.0",
+  "description": "Gurugale Elderly Dementia Care Platform - Nischal Admin Pipeline, Dashboard & Security",
+  "private": true,
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "build": "cd server && npm run build && cd ../client && npm run build"
+  }
+}
