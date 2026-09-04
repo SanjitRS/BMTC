@@ -1,7 +1,11 @@
 package net.kibotu.geofencerelay.ui.guardian
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -25,12 +29,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.BatteryChargingFull
 import androidx.compose.material.icons.filled.BatteryFull
 import androidx.compose.material.icons.filled.Directions
 import androidx.compose.material.icons.filled.GpsFixed
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Security
-import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -40,6 +46,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -63,6 +70,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import net.kibotu.geofencerelay.ui.theme.Blue500
 import net.kibotu.geofencerelay.ui.theme.Emerald500
@@ -80,6 +88,25 @@ fun GuardianScreen(
     vm: GuardianViewModel = viewModel()
 ) {
     val context = LocalContext.current
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) {
+        vm.acquireLocalGpsFix()
+    }
+
+    LaunchedEffect(Unit) {
+        val fineLocation = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+        if (!fineLocation) {
+            permissionLauncher.launch(
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+            )
+        } else {
+            vm.acquireLocalGpsFix()
+        }
+    }
 
     LaunchedEffect(googleAccountEmail) {
         vm.init(googleAccountEmail)
@@ -143,7 +170,7 @@ fun GuardianScreen(
                 .padding(padding)
                 .background(Slate900)
         ) {
-            // Full Screen Map View
+            // Full Screen Interactive Map
             OsmMapView(
                 modifier = Modifier.fillMaxSize(),
                 zone = zone,
@@ -180,7 +207,7 @@ fun GuardianScreen(
                         Column(modifier = Modifier.weight(1f)) {
                             Text("?? SAFE ZONE BREACH DETECTED!", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 14.sp)
                             Text(
-                                "Device moved outside '${zone.name}' (${LocationUtils.formatDistance(targetPing?.distanceFromCenter ?: 0.0)} away).",
+                                "Device is outside '${zone.name}' (${LocationUtils.formatDistance(targetPing?.distanceFromCenter ?: 0.0)} away).",
                                 color = Color.White,
                                 fontSize = 12.sp
                             )
@@ -194,7 +221,7 @@ fun GuardianScreen(
                 onClick = { vm.triggerRecenter() },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(bottom = 290.dp, end = 16.dp),
+                    .padding(bottom = 310.dp, end = 16.dp),
                 containerColor = Slate800,
                 contentColor = Blue500,
                 shape = CircleShape
@@ -224,7 +251,7 @@ fun GuardianScreen(
                             .align(Alignment.CenterHorizontally)
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     // Device Header Info
                     Row(
@@ -234,13 +261,13 @@ fun GuardianScreen(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = targetPing?.deviceName ?: "Searching for Device...",
+                                text = targetPing?.deviceName ?: "Locating Device...",
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
                             )
                             Text(
-                                text = targetPing?.address ?: "Waiting for first GPS fix...",
+                                text = targetPing?.address ?: "Acquiring GPS...",
                                 fontSize = 13.sp,
                                 color = Color.LightGray,
                                 maxLines = 1
@@ -273,7 +300,7 @@ fun GuardianScreen(
                                     .padding(horizontal = 8.dp, vertical = 4.dp)
                             ) {
                                 Text(
-                                    text = if (isBreached) "BREACH" else "SAFE",
+                                    text = if (isBreached) "BREACHED" else "SAFE",
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color.White
@@ -308,9 +335,9 @@ fun GuardianScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(14.dp))
 
-                    // 4 Find My Quick Action Tiles
+                    // Quick Action Tiles
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
@@ -324,7 +351,7 @@ fun GuardianScreen(
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .size(52.dp)
+                                    .size(50.dp)
                                     .clip(CircleShape)
                                     .background(if (isPlayingSound) Red500 else Slate700),
                                 contentAlignment = Alignment.Center
@@ -339,15 +366,18 @@ fun GuardianScreen(
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.clickable {
-                                if (targetPing != null && targetPing!!.latitude != 0.0) {
-                                    val uri = "google.navigation:q=${targetPing!!.latitude},${targetPing!!.longitude}"
+                                val ping = targetPing
+                                val lat = ping?.latitude ?: zone.latitude
+                                val lon = ping?.longitude ?: zone.longitude
+                                if (lat != 0.0 && lon != 0.0) {
+                                    val uri = "google.navigation:q=$lat,$lon"
                                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri)).apply {
                                         setPackage("com.google.android.apps.maps")
                                     }
                                     try {
                                         context.startActivity(intent)
                                     } catch (_: Exception) {
-                                        val webUri = "https://www.google.com/maps/dir/?api=1&destination=${targetPing!!.latitude},${targetPing!!.longitude}"
+                                        val webUri = "https://www.google.com/maps/dir/?api=1&destination=$lat,$lon"
                                         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(webUri)))
                                     }
                                 }
@@ -355,7 +385,7 @@ fun GuardianScreen(
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .size(52.dp)
+                                    .size(50.dp)
                                     .clip(CircleShape)
                                     .background(Blue500),
                                 contentAlignment = Alignment.Center
@@ -375,7 +405,7 @@ fun GuardianScreen(
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .size(52.dp)
+                                    .size(50.dp)
                                     .clip(CircleShape)
                                     .background(if (showZoneEditor) Emerald500 else Slate700),
                                 contentAlignment = Alignment.Center
@@ -384,6 +414,30 @@ fun GuardianScreen(
                             }
                             Spacer(modifier = Modifier.height(4.dp))
                             Text("Safe Zone", fontSize = 11.sp, color = Color.White)
+                        }
+
+                        // 4. Test Breach Simulation Button
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.clickable {
+                                vm.toggleBreachSimulation()
+                            }
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .clip(CircleShape)
+                                    .background(if (isBreached) Red500 else Color(0xFFF59E0B)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    if (isBreached) Icons.Default.Stop else Icons.Default.PlayArrow,
+                                    contentDescription = "Test Breach",
+                                    tint = Color.White
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(if (isBreached) "Reset Safe" else "Test Breach", fontSize = 11.sp, color = Color.White)
                         }
                     }
 

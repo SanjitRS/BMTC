@@ -10,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import android.content.Context
 import net.kibotu.geofencerelay.model.GeofenceZone
 import net.kibotu.geofencerelay.model.LocationPing
 import org.osmdroid.config.Configuration
@@ -30,16 +31,28 @@ fun OsmMapView(
     onMapTapped: (latitude: Double, longitude: Double) -> Unit
 ) {
     val context = LocalContext.current
-    Configuration.getInstance().userAgentValue = context.packageName
 
     val mapView = remember {
+        val sharedPrefs = context.getSharedPreferences("${context.packageName}_osm", Context.MODE_PRIVATE)
+        Configuration.getInstance().load(context, sharedPrefs)
+        Configuration.getInstance().userAgentValue = context.packageName
+
+        val initialLat = when {
+            targetPing != null && targetPing.latitude != 0.0 -> targetPing.latitude
+            zone.latitude != 0.0 -> zone.latitude
+            else -> 12.9716 // Default Bangalore
+        }
+        val initialLon = when {
+            targetPing != null && targetPing.longitude != 0.0 -> targetPing.longitude
+            zone.longitude != 0.0 -> zone.longitude
+            else -> 77.5946
+        }
+
         MapView(context).apply {
             setTileSource(TileSourceFactory.MAPNIK)
             setMultiTouchControls(true)
-            controller.setZoom(16.5)
-            if (zone.latitude != 0.0) {
-                controller.setCenter(GeoPoint(zone.latitude, zone.longitude))
-            }
+            controller.setZoom(17.0)
+            controller.setCenter(GeoPoint(initialLat, initialLon))
         }
     }
 
@@ -50,10 +63,12 @@ fun OsmMapView(
         }
     }
 
-    // Auto-center camera onto target location whenever targetPing arrives or recenter is clicked
+    // Auto-center camera onto target location whenever targetPing arrives or recenter button is clicked
     LaunchedEffect(targetPing?.latitude, targetPing?.longitude, recenterTrigger) {
-        if (targetPing != null && targetPing.latitude != 0.0 && targetPing.longitude != 0.0) {
-            val targetPoint = GeoPoint(targetPing.latitude, targetPing.longitude)
+        val lat = targetPing?.latitude ?: zone.latitude
+        val lon = targetPing?.longitude ?: zone.longitude
+        if (lat != 0.0 && lon != 0.0) {
+            val targetPoint = GeoPoint(lat, lon)
             mapView.controller.animateTo(targetPoint)
         }
     }
@@ -94,7 +109,7 @@ fun OsmMapView(
                 val circleOverlay = Polygon(view).apply {
                     points = circlePoints
                     val strokeColor = if (isBreached) Color.RED else Color.rgb(16, 185, 129)
-                    val fillColor = if (isBreached) Color.argb(45, 239, 68, 68) else Color.argb(45, 16, 185, 129)
+                    val fillColor = if (isBreached) Color.argb(40, 239, 68, 68) else Color.argb(35, 16, 185, 129)
                     outlinePaint.color = strokeColor
                     outlinePaint.strokeWidth = 6f
                     fillPaint.color = fillColor
@@ -112,12 +127,12 @@ fun OsmMapView(
                 view.overlays.add(centerMarker)
             }
 
-            // 3. Draw Tracked Device Marker (Find My style)
+            // 3. Draw Tracked Device Marker (Find My style pin)
             if (targetPing != null && targetPing.latitude != 0.0) {
                 val targetMarker = Marker(view).apply {
                     position = GeoPoint(targetPing.latitude, targetPing.longitude)
                     setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-                    title = if (isBreached) "?? ${targetPing.deviceName} (BREACHED)" else "?? ${targetPing.deviceName}"
+                    title = if (isBreached) "?? ${targetPing.deviceName} (OUTSIDE SAFE ZONE)" else "?? ${targetPing.deviceName}"
                     snippet = "${targetPing.address} | ${targetPing.batteryLevel}% ??"
                 }
                 view.overlays.add(targetMarker)
