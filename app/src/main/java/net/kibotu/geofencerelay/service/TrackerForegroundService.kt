@@ -181,13 +181,14 @@ class TrackerForegroundService : Service() {
         val accuracy = location.accuracy
         val speed = location.speed
 
-        val distance = if (zone != null) {
-            LocationUtils.distanceMeters(lat, lon, zone.latitude, zone.longitude)
+        val hasValidZone = zone != null && zone.latitude != 0.0 && zone.longitude != 0.0
+        val distance = if (hasValidZone) {
+            LocationUtils.distanceMeters(lat, lon, zone!!.latitude, zone.longitude)
         } else {
             0.0
         }
 
-        val isInside = if (zone != null) distance <= zone.radiusMeters else true
+        val isInside = if (hasValidZone) distance <= zone!!.radiusMeters else true
 
         // Breach transition check
         if (!isInside && !isCurrentlyBreached) {
